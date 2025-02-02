@@ -42,5 +42,22 @@
     <footer class="bg-blue-500 p-4 text-center text-white mt-8">
         <p>&copy; 2025 CAMAIE. All rights reserved.</p>
     </footer>
+
+    <script>
+    document.getElementById("sendButton").addEventListener("click", async () => {
+        const userMessage = document.getElementById("userInput").value;
+        const response = await fetch("http://127.0.0.1:5000/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: userMessage }),
+        });
+        const data = await response.json();
+        const messagesDiv = document.getElementById("messages");
+        messagesDiv.innerHTML += `<p><strong>User:</strong> ${userMessage}</p>`;
+        messagesDiv.innerHTML += `<p><strong>Bot:</strong> ${data.response}</p>`;
+        document.getElementById("userInput").value = ""; // Clear input
+    });
+</script>
+
 </body>
 </html>
