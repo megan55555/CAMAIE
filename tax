@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tax Calculation Assistant - CAMAIE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-green-50 text-gray-900">
+    <!-- Navbar -->
+    <nav class="bg-green-500 p-4 text-white">
+        <div class="container mx-auto flex justify-between">
+            <h1 class="text-xl font-bold">CAMAIE</h1>
+            <ul class="flex space-x-4">
+                <li><a href="index.html" class="hover:underline">Home</a></li>
+                <li><a href="contact.html" class="hover:underline">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto mt-8 p-4">
+        <h2 class="text-2xl font-bold text-green-700">Tax Calculation Assistant</h2>
+        <p class="mt-2">This AI assistant simplifies tax calculations, ensuring compliance and accuracy while reducing manual workload.</p>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-green-500 p-4 text-center text-white mt-8">
+        <p>&copy; 2025 CAMAIE. All rights reserved.</p>
+    </footer>
+</body>
+</html>
