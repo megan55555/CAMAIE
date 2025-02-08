@@ -8,8 +8,9 @@
     <style>
         /* Custom Styles */
         body {
-            background-color: #f8f9fc;
+            background: linear-gradient(135deg, #ff9a9e, #fad0c4);
             font-family: 'Arial', sans-serif;
+            color: #333;
         }
         .chat-container {
             max-width: 500px;
@@ -19,19 +20,21 @@
             padding: 20px;
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
             text-align: center;
+            border: 4px solid #ff4081;
         }
         .chat-title {
-            font-size: 24px;
+            font-size: 26px;
             font-weight: bold;
-            color: #6a0dad;
+            color: #ff4081;
+            margin-top: 10px;
         }
         .chat-box {
             height: 400px;
             overflow-y: auto;
-            border: 1px solid #ddd;
+            border: 2px solid #ff4081;
             border-radius: 8px;
             padding: 10px;
-            background-color: #f9f9f9;
+            background-color: #fff4f7;
             text-align: left;
         }
         .chat-message {
@@ -41,14 +44,17 @@
             max-width: 80%;
         }
         .user-message {
-            background-color: #6a0dad;
+            background-color: #ff4081;
             color: white;
             align-self: flex-end;
+            text-align: right;
+            font-weight: bold;
         }
         .bot-message {
-            background-color: #e3d7f3;
+            background-color: #fad0c4;
             color: black;
             align-self: flex-start;
+            font-weight: bold;
         }
         .input-container {
             display: flex;
@@ -58,20 +64,21 @@
             flex: 1;
             padding: 10px;
             border-radius: 8px;
-            border: 1px solid #ddd;
+            border: 2px solid #ff4081;
+            background-color: #fff4f7;
         }
         .send-btn {
-            background-color: #6a0dad;
+            background-color: #ff4081;
             color: white;
             padding: 10px 20px;
             border: none;
             border-radius: 8px;
             cursor: pointer;
             margin-left: 10px;
+            font-weight: bold;
         }
-        .logo-container img {
-            width: 150px;
-            margin-bottom: 10px;
+        .send-btn:hover {
+            background-color: #e60073;
         }
     </style>
 </head>
@@ -79,10 +86,10 @@
     <!-- Chatbot Container -->
     <div class="chat-container">
         <!-- Encore Logo -->
-        <div class="logo-container">
-            <img src="https://encorekids.ie/home/encore-300_300/#iLightbox[postimages]/0" alt="Encore Logo">
+        <div>
+            <img src="https://github.com/megan55555/CAMAIE/blob/main/encorelogo.jpeg" alt="Encore Logo" width="150" style="margin-bottom: 10px;">
         </div>
-        
+
         <h1 class="chat-title">Encore Chatbot 🎭</h1>
         <p style="color: #444;">Ask me anything about Encore classes, fees, and shows!</p>
 
