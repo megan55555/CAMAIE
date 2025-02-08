@@ -1,38 +1,42 @@
-// DOM Elements
-const userInput = document.getElementById('userInput');
-const sendButton = document.getElementById('sendButton');
-const messages = document.getElementById('messages');
+const fetch = require('node-fetch'); // Use require for node-fetch v2
 
-// Function to display messages
-const addMessage = (role, text) => {
-    const message = document.createElement('div');
-    message.className = role === 'user' ? 'text-right mb-2' : 'text-left mb-2';
-    message.innerHTML = `<span class="inline-block p-2 rounded ${
-        role === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-900'
-    }">${text}</span>`;
-    messages.appendChild(message);
-    messages.scrollTop = messages.scrollHeight; // Auto-scroll
-};
-
-// Event Listener for Sending Messages
-sendButton.addEventListener('click', async () => {
-    const userMessage = userInput.value.trim();
-    if (!userMessage) return;
-
-    addMessage('user', userMessage);
-    userInput.value = '';
+exports.handler = async (event) => {
+    const { message } = JSON.parse(event.body); // Get the user's message from the request
 
     try {
-        const response = await fetch('/.netlify/functions/chatbot', {
+        console.log('Received message:', message); // Debugging: Log the incoming message
+
+        // Call the OpenAI API
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: userMessage })
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${process.env.OPENAI_API_KEY}` // Use the environment variable for the API key
+            },
+            body: JSON.stringify({
+                model: "gpt-3.5-turbo",
+                messages: [{ role: "user", content: message }]
+            })
         });
 
         const data = await response.json();
-        addMessage('bot', data.reply || 'Error: No response received.');
+        console.log('OpenAI API response:', data); // Debugging: Log the API response
+
+        // Check if the response contains valid choices
+        if (!data.choices || data.choices.length === 0) {
+            throw new Error('Invalid response from OpenAI: No choices available');
+        }
+
+        // Return the chatbot's response
+        return {
+            statusCode: 200,
+            body: JSON.stringify({ reply: data.choices[0].message.content })
+        };
     } catch (error) {
-        addMessage('bot', 'Error: Unable to connect to the server.');
-        console.error(error);
+        console.error('Error:', error.message); // Debugging: Log the error message
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: error.message || 'Failed to fetch response from OpenAI' })
+        };
     }
-});
+};
