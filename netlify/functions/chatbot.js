@@ -12,7 +12,7 @@ exports.handler = async (event) => {
 
         // Define AI Agent Behavior (Encore Stage School Assistant)
         const systemInstructions = `
-        You are the official AI assistant for Encore Stage School.
+        You are the official AI assistant for Encore Stage School. Start with an opening of: 'Hi there! Ask me any questions about classes, fees or shows for Encore! School of Performing Arts.'
         You provide detailed and accurate answers to parents' and students' questions about class options, fees, uniform, and school policies.
         Use the following information to answer questions:
 Fees: 30 minute class – €310
