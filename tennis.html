@@ -3,37 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tennis Sub Selector - CAMAIE</title>
+    <title>Encore Chatbot - CAMAIE</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom Styles */
+        body {
+            background-color: #f8f9fc;
+            font-family: 'Arial', sans-serif;
+        }
+        .chat-container {
+            max-width: 500px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .chat-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #6a0dad;
+        }
+        .chat-box {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            text-align: left;
+        }
+        .chat-message {
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            max-width: 80%;
+        }
+        .user-message {
+            background-color: #6a0dad;
+            color: white;
+            align-self: flex-end;
+        }
+        .bot-message {
+            background-color: #e3d7f3;
+            color: black;
+            align-self: flex-start;
+        }
+        .input-container {
+            display: flex;
+            margin-top: 10px;
+        }
+        .chat-input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        .send-btn {
+            background-color: #6a0dad;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .logo-container img {
+            width: 150px;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
-<body class="bg-blue-50 text-gray-900">
-    <!-- Navbar -->
-    <nav class="bg-blue-500 p-4 text-white">
-        <div class="container mx-auto flex justify-between">
-            <h1 class="text-xl font-bold">CAMAIE</h1>
-            <ul class="flex space-x-4">
-                <li><a href="index.html" class="hover:underline">Home</a></li>
-                <li><a href="contact.html" class="hover:underline">Contact</a></li>
-            </ul>
+<body>
+    <!-- Chatbot Container -->
+    <div class="chat-container">
+        <!-- Encore Logo -->
+        <div class="logo-container">
+            <img src="https://encorekids.ie/home/encore-300_300/#iLightbox[postimages]/0" alt="Encore Logo">
         </div>
-    </nav>
+        
+        <h1 class="chat-title">Encore Chatbot 🎭</h1>
+        <p style="color: #444;">Ask me anything about Encore classes, fees, and shows!</p>
 
-    <!-- Main Content -->
-    <div class="container mx-auto mt-8 p-4">
-        <h2 class="text-2xl font-bold text-blue-700">Tennis Sub Selector</h2>
-        <p class="mt-2">This AI-powered tool helps you select the best substitute for your tennis matches based on player performance, fatigue levels, and match conditions.</p>
+        <div id="chatBox" class="chat-box">
+            <!-- Chat messages appear here -->
+        </div>
+
+        <div class="input-container">
+            <input id="userInput" class="chat-input" placeholder="Type your message...">
+            <button id="sendButton" class="send-btn">Send</button>
+        </div>
     </div>
-    
-<div id="chatBox" class="bg-white p-4 rounded shadow">
-    <div id="messages" class="h-64 overflow-y-auto mb-4 p-2 border rounded bg-gray-50"></div>
-    <input id="userInput" class="border rounded p-2 w-full mb-2" placeholder="Type your message...">
-    <button id="sendButton" class="bg-blue-500 text-white py-2 px-4 rounded">Send</button>
-</div>
 
-    <!-- Footer -->
-    <footer class="bg-blue-500 p-4 text-center text-white mt-8">
-        <p>&copy; 2025 CAMAIE. All rights reserved.</p>
-    </footer>
-    <script src="chatbot.js"></script>
+    <!-- Chatbot JavaScript -->
+    <script>
+        const userInput = document.getElementById('userInput');
+        const sendButton = document.getElementById('sendButton');
+        const chatBox = document.getElementById('chatBox');
+
+        const addMessage = (role, text) => {
+            const message = document.createElement('div');
+            message.className = 'chat-message ' + (role === 'user' ? 'user-message' : 'bot-message');
+            message.innerText = text;
+            chatBox.appendChild(message);
+            chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll
+        };
+
+        sendButton.addEventListener('click', async () => {
+            const message = userInput.value.trim();
+            if (!message) return;
+            
+            addMessage('user', message);
+            userInput.value = '';
+
+            try {
+                const response = await fetch('/.netlify/functions/chatbot', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message })
+                });
+
+                const data = await response.json();
+                addMessage('bot', data.reply || 'Sorry, I am unable to respond at the moment.');
+            } catch (error) {
+                addMessage('bot', 'Error connecting to chatbot.');
+            }
+        });
+    </script>
 </body>
 </html>
+
