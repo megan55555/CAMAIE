@@ -1,5 +1,15 @@
 {
+  "name": "camaie",
+  "version": "1.0.0",
+  "description": "CAMAIE AI tools",
+  "main": "index.js",
+  "scripts": {
+    "start": "netlify dev",
+    "build": "netlify build",
+    "deploy": "netlify deploy"
+  },
   "dependencies": {
     "node-fetch": "^2.6.7"
-  }
+  },
+  "license": "MIT"
 }
