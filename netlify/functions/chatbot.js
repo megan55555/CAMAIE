@@ -3,41 +3,43 @@ const fetch = require('node-fetch'); // Use require for node-fetch v2
 exports.handler = async (event) => {
     try {
         const { message } = JSON.parse(event.body);
-        console.log('Received message:', message); // Debug: Log incoming messages
+        console.log('Received message:', message); // Debugging
 
-        // Check if API Key is available
-        if (!process.env.OPENAI_API_KEY) {
-            throw new Error('Missing OpenAI API Key in environment variables.');
+        // Check if Claude API Key is available
+        if (!process.env.CLAUDE_API_KEY) {
+            throw new Error('Missing Claude API Key in environment variables.');
         }
 
-        // Make request to OpenAI API
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        // Make request to Anthropic's Claude API
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${process.env.OPENAI_API_KEY}` // Secure API Key
+                'x-api-key': process.env.CLAUDE_API_KEY, // Secure API Key
+                'anthropic-version': '2023-06-01' // Ensure correct API version
             },
             body: JSON.stringify({
-                model: "gpt-3.5-turbo",
+                model: "claude-2", // Free-tier model
+                max_tokens: 256,
                 messages: [{ role: "user", content: message }]
             })
         });
 
         const data = await response.json();
-        console.log('Full OpenAI API response:', JSON.stringify(data, null, 2)); // Debug: Print full response
+        console.log('Claude AI response:', JSON.stringify(data, null, 2)); // Debugging
 
-        // Ensure a valid response
-        if (!data.choices || data.choices.length === 0 || !data.choices[0].message) {
-            throw new Error(`Invalid OpenAI response: ${JSON.stringify(data)}`);
+        // Ensure valid response
+        if (!data.content || data.content.length === 0) {
+            throw new Error('Invalid response from Claude AI.');
         }
 
         return {
             statusCode: 200,
-            body: JSON.stringify({ reply: data.choices[0].message.content })
+            body: JSON.stringify({ reply: data.content[0].text }) // Extract response
         };
 
     } catch (error) {
-        console.error('Error:', error.message); // Debug: Log error for investigation
+        console.error('Error:', error.message);
         return {
             statusCode: 500,
             body: JSON.stringify({ error: error.message || 'Server error.' })
