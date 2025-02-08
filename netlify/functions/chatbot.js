@@ -5,37 +5,36 @@ exports.handler = async (event) => {
         const { message } = JSON.parse(event.body);
         console.log('Received message:', message); // Debugging
 
-        // Check if Claude API Key is available
-        if (!process.env.CLAUDE_API_KEY) {
-            throw new Error('Missing Claude API Key in environment variables.');
+        // Check if Mistral API Key is available
+        if (!process.env.MISTRAL_API_KEY) {
+            throw new Error('Missing Mistral API Key in environment variables.');
         }
 
-        // Make request to Anthropic's Claude API
-        const response = await fetch('https://api.anthropic.com/v1/messages', {
+        // Make request to Mistral's API
+        const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'x-api-key': process.env.CLAUDE_API_KEY, // Secure API Key
-                'anthropic-version': '2023-06-01' // Ensure correct API version
+                'Authorization': `Bearer ${process.env.MISTRAL_API_KEY}` // Secure API Key
             },
             body: JSON.stringify({
-                model: "claude-2", // Free-tier model
-                max_tokens: 256,
-                messages: [{ role: "user", content: message }]
+                model: "mistral-medium", // Free-tier model
+                messages: [{ role: "user", content: message }],
+                max_tokens: 256
             })
         });
 
         const data = await response.json();
-        console.log('Claude AI response:', JSON.stringify(data, null, 2)); // Debugging
+        console.log('Mistral API response:', JSON.stringify(data, null, 2)); // Debugging
 
         // Ensure valid response
-        if (!data.content || data.content.length === 0) {
-            throw new Error('Invalid response from Claude AI.');
+        if (!data.choices || data.choices.length === 0) {
+            throw new Error('Invalid response from Mistral AI.');
         }
 
         return {
             statusCode: 200,
-            body: JSON.stringify({ reply: data.content[0].text }) // Extract response
+            body: JSON.stringify({ reply: data.choices[0].message.content }) // Extract response
         };
 
     } catch (error) {
