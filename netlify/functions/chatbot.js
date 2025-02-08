@@ -1,4 +1,4 @@
-import fetch from 'node-fetch'; // Use import for node-fetch v3
+const fetch = require('node-fetch'); // Use require for node-fetch v2
 
 exports.handler = async (event) => {
     const { message } = JSON.parse(event.body); // Get the user's message from the request
@@ -25,11 +25,12 @@ exports.handler = async (event) => {
             body: JSON.stringify({ reply: data.choices[0].message.content })
         };
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error:', error); // Log errors for debugging
         return {
             statusCode: 500,
-            body: JSON.stringify({ error: 'Failed to fetch response from OpenAI' })
+            body: JSON.stringify({ error: error.message || 'Failed to fetch response from OpenAI' })
         };
     }
 };
+
 
