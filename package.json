@@ -1,8 +1,4 @@
 {
-  "name": "camaie",
-  "version": "1.0.0",
-  "description": "CAMAIE AI tools",
-  "main": "index.js",
   "dependencies": {
     "node-fetch": "^2.6.7"
   }
