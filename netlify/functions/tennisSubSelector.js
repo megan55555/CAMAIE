@@ -1,5 +1,7 @@
 const formidable = require('formidable');
 const fs = require('fs');
+const mammoth = require('mammoth'); // For Word docs
+const pdfParse = require('pdf-parse'); // For PDFs
 const fetch = require('node-fetch');
 
 exports.handler = async (event) => {
@@ -18,12 +20,30 @@ exports.handler = async (event) => {
             throw new Error('Please upload all required files.');
         }
 
-        // Read the file contents
-        const rulesText = fs.readFileSync(files.rulesFile.path, 'utf-8');
-        const teamText = fs.readFileSync(files.teamFile.path, 'utf-8');
-        const subsText = fs.readFileSync(files.subsFile.path, 'utf-8');
+        // Function to extract text from different file types
+        async function extractText(file) {
+            const filePath = file.path;
+            const fileExt = file.name.split('.').pop().toLowerCase();
 
-        // Create a prompt for the AI
+            if (fileExt === 'txt') {
+                return fs.readFileSync(filePath, 'utf-8');
+            } else if (fileExt === 'docx') {
+                const result = await mammoth.extractRawText({ path: filePath });
+                return result.value;
+            } else if (fileExt === 'pdf') {
+                const data = await pdfParse(fs.readFileSync(filePath));
+                return data.text;
+            } else {
+                throw new Error('Unsupported file type. Please upload .txt, .docx, or .pdf files.');
+            }
+        }
+
+        // Extract text from the uploaded files
+        const rulesText = await extractText(files.rulesFile);
+        const teamText = await extractText(files.teamFile);
+        const subsText = await extractText(files.subsFile);
+
+        // Create a structured prompt for the AI
         const prompt = `
         You are an assistant for a Tennis Club. The club has rules about substitutions, which are provided below.
 
@@ -39,7 +59,7 @@ exports.handler = async (event) => {
         Please select the most **suitable substitutes** based on the rules. Provide a **clear, structured response** explaining why each substitute is chosen.
         `;
 
-        // Send to AI Model (Example: GPT-4 or Mistral)
+        // Send to AI Model (Example: Mistral or GPT)
         const aiResponse = await fetch('https://api.mistral.ai/v1/chat/completions', {
             method: 'POST',
             headers: {
@@ -71,5 +91,6 @@ exports.handler = async (event) => {
         };
     }
 };
+
 
 
