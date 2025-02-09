@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "node-fetch": "^2.6.7",
-    "formidable-serverless": "^0.1.4"
+    "formidable": "^2.0.1"
   },
   "license": "MIT"
 }
