@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Calculate your monthly tax and net pay with CAMAIE's Tax Calculator.">
+    <title>Tax Calculator - CAMAIE</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>CAMAIE Tax Calculator</h1>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <section class="calculator-intro">
+                <h2>Calculate Your Monthly Tax and Net Pay</h2>
+                <p>Enter your details below to get an accurate calculation of your monthly tax and net pay.</p>
+            </section>
+
+            <section class="calculator-form">
+                <form id="taxCalculatorForm">
+                    <div class="form-group">
+                        <label for="name">Full Name:</label>
+                        <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="hoursWorked">Hours Worked:</label>
+                        <input type="number" id="hoursWorked" name="hoursWorked" placeholder="Enter hours worked" required>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn-calculate">Calculate Payslip</button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="calculator-result">
+                <h3>Your Payslip Details</h3>
+                <div id="result" class="result-output"></div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2023 CAMAIE. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="tax-calculator.js"></script>
+</body>
+</html>
