@@ -6,25 +6,52 @@ const employees = {
     "Ciara McKenna": { hourlyWage: 40, maritalStatus: "single", otherSalary: 0 },
 };
 
-exports.handler = async function(event) {
+exports.handler = async function (event) {
     try {
-        const { name } = JSON.parse(event.body);
-
-        if (!employees[name]) {
+        // Ensure the request method is POST
+        if (event.httpMethod !== "POST") {
             return {
-                statusCode: 404,
-                body: JSON.stringify({ error: "Employee not found" })
+                statusCode: 405,
+                body: JSON.stringify({ error: "Method Not Allowed" }),
             };
         }
 
+        // Ensure the request body exists
+        if (!event.body) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ error: "Missing request body" }),
+            };
+        }
+
+        // Parse the request body
+        const { name } = JSON.parse(event.body);
+
+        if (!name) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ error: "Missing 'name' in request body" }),
+            };
+        }
+
+        // Check if the employee exists
+        const employee = employees[name];
+        if (!employee) {
+            return {
+                statusCode: 404,
+                body: JSON.stringify({ error: "Employee not found" }),
+            };
+        }
+
+        // Return the employee data
         return {
             statusCode: 200,
-            body: JSON.stringify(employees[name])
+            body: JSON.stringify(employee),
         };
     } catch (error) {
         return {
             statusCode: 500,
-            body: JSON.stringify({ error: "Server error", details: error.message })
+            body: JSON.stringify({ error: "Server error", details: error.message }),
         };
     }
 };
