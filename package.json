@@ -8,9 +8,11 @@
     "build": "netlify build",
     "deploy": "netlify deploy"
   },
-  "dependencies": {
+"dependencies": {
     "node-fetch": "^2.6.7",
-    "formidable": "^2.0.1"
-  },
+    "formidable": "^2.0.1",
+    "mammoth": "^1.4.2",
+    "pdf-parse": "^1.1.1"
+},
   "license": "MIT"
 }
