@@ -1,3 +1,5 @@
+const fetch = require("node-fetch");
+
 const employees = {
     "Megan O'Neill": { hourlyWage: 40, maritalStatus: "single", otherSalary: 36000 },
     "Aimee O'Neill": { hourlyWage: 40, maritalStatus: "single", otherSalary: 0 },
@@ -8,33 +10,15 @@ const employees = {
 
 exports.handler = async function (event) {
     try {
-        // Ensure the request method is POST
-        if (event.httpMethod !== "POST") {
-            return {
-                statusCode: 405,
-                body: JSON.stringify({ error: "Method Not Allowed" }),
-            };
+        // Retrieve the Mistral API key from environment variables
+        const mistralApiKey = process.env.MISTRAL_API_KEY;
+        if (!mistralApiKey) {
+            throw new Error("Mistral API key is not set in environment variables.");
         }
 
-        // Ensure the request body exists
-        if (!event.body) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({ error: "Missing request body" }),
-            };
-        }
+        const { name, hoursWorked } = JSON.parse(event.body);
 
-        // Parse the request body
-        const { name } = JSON.parse(event.body);
-
-        if (!name) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({ error: "Missing 'name' in request body" }),
-            };
-        }
-
-        // Check if the employee exists
+        // Fetch employee details
         const employee = employees[name];
         if (!employee) {
             return {
@@ -43,15 +27,43 @@ exports.handler = async function (event) {
             };
         }
 
-        // Return the employee data
+        const grossSalary = employee.hourlyWage * hoursWorked;
+
+        // Send data to the Mistral API for tax calculations
+        const aiResponse = await fetch("https://api.mistral.ai/v1/calculate", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${mistralApiKey}`,
+            },
+            body: JSON.stringify({
+                grossSalary,
+                maritalStatus: employee.maritalStatus,
+                otherSalary: employee.otherSalary,
+                country: "Ireland",
+            }),
+        });
+
+        if (!aiResponse.ok) {
+            throw new Error(`Mistral API error: ${aiResponse.status}`);
+        }
+
+        const taxData = await aiResponse.json();
+
         return {
             statusCode: 200,
-            body: JSON.stringify(employee),
+            body: JSON.stringify({
+                name,
+                grossSalary,
+                ...taxData,
+            }),
         };
     } catch (error) {
+        console.error("Error:", error.message);
         return {
             statusCode: 500,
             body: JSON.stringify({ error: "Server error", details: error.message }),
         };
     }
 };
+
