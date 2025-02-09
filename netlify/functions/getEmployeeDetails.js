@@ -1,21 +1,13 @@
 const employees = {
-    "Megan O'Neill": { hourlyWage: 40, maritalStatus: "single", otherSalary: 36,000 },
+    "Megan O'Neill": { hourlyWage: 40, maritalStatus: "single", otherSalary: 36000 },
     "Aimee O'Neill": { hourlyWage: 40, maritalStatus: "single", otherSalary: 0 },
-    "Joeann Hussey": { hourlyWage: 40, maritalStatus: "single", otherSalary: 40,0000 },
+    "Joeann Hussey": { hourlyWage: 40, maritalStatus: "single", otherSalary: 40000 },
     "Ruth Cahill": { hourlyWage: 40, maritalStatus: "married", otherSalary: 0 },
     "Ciara McKenna": { hourlyWage: 40, maritalStatus: "single", otherSalary: 0 },
 };
 
 exports.handler = async function(event) {
     try {
-        const employees = {
-           "Megan O'Neill": { hourlyWage: 40, maritalStatus: "single", otherSalary: 36,000 },
-    "Aimee O'Neill": { hourlyWage: 40, maritalStatus: "single", otherSalary: 0 },
-    "Joeann Hussey": { hourlyWage: 40, maritalStatus: "single", otherSalary: 40,0000 },
-    "Ruth Cahill": { hourlyWage: 40, maritalStatus: "married", otherSalary: 0 },
-    "Ciara McKenna": { hourlyWage: 40, maritalStatus: "single", otherSalary: 0 }
-        };
-
         const { name } = JSON.parse(event.body);
 
         if (!employees[name]) {
@@ -29,7 +21,6 @@ exports.handler = async function(event) {
             statusCode: 200,
             body: JSON.stringify(employees[name])
         };
-
     } catch (error) {
         return {
             statusCode: 500,
