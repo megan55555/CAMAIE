@@ -1,6 +1,19 @@
-const fetch = require("node-fetch");
 
-const employees = {
+
+const fetch = require("node-fetch"); // Ensure node-fetch v2 is used
+
+exports.handler = async (event) => {
+    try {
+        const { name, hoursWorked } = JSON.parse(event.body);
+        console.log("📩 Received request for:", name, "with hours worked:", hoursWorked);
+
+        // ✅ Ensure Mistral API Key is available (Same as Encore chatbot)
+        if (!process.env.MISTRAL_API_KEY) {
+            throw new Error("Missing Mistral API Key in environment variables.");
+        }
+
+        // Hardcoded employee data (as in previous versions)
+       const employees = {
     "Megan O'Neill": { hourlyWage: 40, maritalStatus: "single", otherSalary: 36000 },
     "Aimee O'Neill": { hourlyWage: 40, maritalStatus: "single", otherSalary: 0 },
     "Joeann Hussey": { hourlyWage: 40, maritalStatus: "single", otherSalary: 40000 },
@@ -8,14 +21,10 @@ const employees = {
     "Ciara McKenna": { hourlyWage: 40, maritalStatus: "single", otherSalary: 0 },
 };
 
-
-exports.handler = async function (event) {
-    try {
-        const { name, hoursWorked } = JSON.parse(event.body);
-
-        // Get employee details
+        // Check if employee exists
         const employee = employees[name];
         if (!employee) {
+            console.error("🚨 Employee not found:", name);
             return {
                 statusCode: 404,
                 body: JSON.stringify({ error: "Employee not found" }),
@@ -23,27 +32,36 @@ exports.handler = async function (event) {
         }
 
         const grossSalary = employee.hourlyWage * hoursWorked;
+        console.log("📊 Calculating salary:", grossSalary);
 
-        // 🛠️ Use the same endpoint as your other bots
+        // ✅ Format the prompt exactly like a chatbot request
+        const prompt = `You are an AI trained in Irish tax rules.
+        Given:
+        - Gross salary: €${grossSalary}
+        - Marital status: ${employee.maritalStatus}
+        - Other income: €${employee.otherSalary}
+
+        Calculate the following:
+        - Income Tax
+        - USC
+        - PRSI
+        - Net Salary
+
+        Provide the response in a structured JSON format.`;
+
+        console.log("📡 Sending request to Mistral...");
+
+        // ✅ Make the request exactly as done in Encore chatbot
         const aiResponse = await fetch("https://api.mistral.ai/v1/completions", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${process.env.MISTRAL_API_KEY}`, // ✅ Using Netlify stored API key
+                "Authorization": `Bearer ${process.env.MISTRAL_API_KEY}`, // ✅ Using Netlify-stored key
             },
             body: JSON.stringify({
-                model: "mistral-medium",  // Change to match the model used in your other bots
-                prompt: `You are an Irish tax calculator. Given:
-                - Gross salary: €${grossSalary}
-                - Marital status: ${employee.maritalStatus}
-                - Other income: €${employee.otherSalary}
-
-                Calculate the net salary after applying Irish tax rules. Provide a breakdown of:
-                - Income Tax
-                - USC
-                - PRSI
-                - Net Salary`,
-                max_tokens: 250,
+                model: "mistral-medium", // ✅ Ensure this matches your other bots
+                prompt: prompt,
+                max_tokens: 300,
             }),
         });
 
@@ -51,15 +69,15 @@ exports.handler = async function (event) {
             throw new Error(`Mistral API error: ${aiResponse.status}`);
         }
 
-        const aiText = await aiResponse.text();
-        console.log("Mistral API Response:", aiText); // Debugging line
+        const aiText = await aiResponse.text(); // ✅ Capture full response before parsing
+        console.log("📩 Mistral API Raw Response:", aiText);
 
         return {
             statusCode: 200,
-            body: aiText, // Directly return Mistral's response
+            body: aiText, // ✅ Return raw Mistral response directly
         };
     } catch (error) {
-        console.error("Error:", error.message);
+        console.error("🚨 Error:", error.message);
         return {
             statusCode: 500,
             body: JSON.stringify({ error: "Server error", details: error.message }),
