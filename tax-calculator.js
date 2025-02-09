@@ -13,7 +13,7 @@ async function handleFormSubmit(event) {
 
     try {
         // Send data to the backend function
-        const response = await fetch("/.netlify/functions/calculatePayslip", {
+        const response = await fetch("/.netlify/functions/getEmployeeDetails", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ name, hoursWorked }),
