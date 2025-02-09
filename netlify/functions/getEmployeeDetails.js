@@ -8,17 +8,12 @@ const employees = {
     "Ciara McKenna": { hourlyWage: 40, maritalStatus: "single", otherSalary: 0 },
 };
 
+
 exports.handler = async function (event) {
     try {
-        // Retrieve the Mistral API key from environment variables
-        const mistralApiKey = process.env.MISTRAL_API_KEY;
-        if (!mistralApiKey) {
-            throw new Error("Mistral API key is not set in environment variables.");
-        }
-
         const { name, hoursWorked } = JSON.parse(event.body);
 
-        // Fetch employee details
+        // Get employee details
         const employee = employees[name];
         if (!employee) {
             return {
@@ -29,18 +24,26 @@ exports.handler = async function (event) {
 
         const grossSalary = employee.hourlyWage * hoursWorked;
 
-        // Send data to the Mistral API for tax calculations
-        const aiResponse = await fetch("https://api.mistral.ai/v1/calculate", {
+        // 🛠️ Use the same endpoint as your other bots
+        const aiResponse = await fetch("https://api.mistral.ai/v1/completions", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${mistralApiKey}`,
+                "Authorization": `Bearer ${process.env.MISTRAL_API_KEY}`, // ✅ Using Netlify stored API key
             },
             body: JSON.stringify({
-                grossSalary,
-                maritalStatus: employee.maritalStatus,
-                otherSalary: employee.otherSalary,
-                country: "Ireland",
+                model: "mistral-medium",  // Change to match the model used in your other bots
+                prompt: `You are an Irish tax calculator. Given:
+                - Gross salary: €${grossSalary}
+                - Marital status: ${employee.maritalStatus}
+                - Other income: €${employee.otherSalary}
+
+                Calculate the net salary after applying Irish tax rules. Provide a breakdown of:
+                - Income Tax
+                - USC
+                - PRSI
+                - Net Salary`,
+                max_tokens: 250,
             }),
         });
 
@@ -48,15 +51,12 @@ exports.handler = async function (event) {
             throw new Error(`Mistral API error: ${aiResponse.status}`);
         }
 
-        const taxData = await aiResponse.json();
+        const aiText = await aiResponse.text();
+        console.log("Mistral API Response:", aiText); // Debugging line
 
         return {
             statusCode: 200,
-            body: JSON.stringify({
-                name,
-                grossSalary,
-                ...taxData,
-            }),
+            body: aiText, // Directly return Mistral's response
         };
     } catch (error) {
         console.error("Error:", error.message);
@@ -66,4 +66,3 @@ exports.handler = async function (event) {
         };
     }
 };
-
